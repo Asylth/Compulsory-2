@@ -1,9 +1,10 @@
 #include <iostream>
 #include <time.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 
-int drawcard(int);
+int drawcard(int); //places the player draw
 int gencard();
 bool wincon();
 int playeraction();
@@ -30,7 +31,6 @@ int main()
 {
 	do {
 		playeraction(); //player draw
-		wincon(); // checks win con
 		house(); //house draws
 	} while (wincon() == true);
 	std::cout << "You lose!";
@@ -53,6 +53,9 @@ void printhand() {
 		std::cout << Vplayer[i] << ", ";
 		}
 	}
+	for (int i = 0; i < Vplayer.size(); i++) {
+		pscore = pscore + Vplayer.at(i);
+	}
 }
 
 int playeraction() {
@@ -64,8 +67,8 @@ int playeraction() {
 		std::cin >> pchoice;
 		drawcard(pchoice);
 		printhand();
+		std::cout << "Your total: " << pscore << std::endl;
 		std::cout << std::endl;
-		wincon();
 		if (wincon() == false) {
 			return 0;
 		}
@@ -84,37 +87,43 @@ int playeraction() {
 }
 
 int gencard() {
-	std::cout << "The house draws: ";
+	int nrof10 = 0;
 	srand(time(NULL));
-	for (int i = 0; i < (Vhcard.size() + 1); i++) {
+	//std::srand(static_cast<unsigned int>(std::time(nullptr)));
+	for (int i = 0; i < (Vhcard.size()); i++) {
 		if (Vhcard.at(i) == 0) {
 			Vhcard.at(i) = rand() % 10 + 1;
+			if (Vhcard.at(i) == 10) {
+				nrof10++;
+			}
+			if (nrof10 >= 4) {
+				Vhcard.at(i) = rand() % 10 + 1;
+			}
+			std::cout << "The house draws: ";
 			std::cout << Vhcard.at(i) << std::endl;
 			return 0;
 		}
 	}
-	return 0;
 }
 
 bool wincon() {
-	for (int i = 0; i < Vplayer.size(); i++) {
-		pscore + Vplayer.at(i);
-	}
 	if (pscore >= 21) {
 		return false;
 	}
 	else {
 		return true;
 	}
+	
 }
 
 void house() {
 	bool con = true;
 	do {
 		gencard();
-		for (int i = 0; Vhcard.size(); i++) {
-			hscore + Vhcard.at(i);
+		for (auto i : Vhcard) {
+			hscore += i;
 		}
+		std::cout << "House total: " << hscore;
 		std::cout << hscore << std::endl;
 		if (hscore > pscore) {
 			con = false;
