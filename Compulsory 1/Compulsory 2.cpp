@@ -6,15 +6,16 @@
 
 int drawcard(int); //places the player draw
 int gencard();
-bool wincon();
+bool pscorecheck();
 int playeraction();
 void printhand();
 void house();
+int wincheck();
 
 bool run = true;
 int pchoice;
-std::vector <int> Vplayer = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-std::vector <int> Vhcard = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+std::vector <int> Vplayer;
+std::vector <int> Vhcard;
 
 struct card {
 	int val;
@@ -22,6 +23,7 @@ struct card {
 };
 int pscore = 0;
 int hscore = 0;
+int housedraw = 0;
 bool match = false;
 bool pvic = false;
 bool hvic = false;
@@ -32,17 +34,18 @@ int main()
 	do {
 		playeraction(); //player draw
 		house(); //house draws
-	} while (wincon() == true);
-	std::cout << "You lose!";
+	} while (wincheck == 0 && pscorecheck() == true);
 }
 
 int drawcard(int val) {
-	for (int i = 0; i < (Vplayer.size() + 1); i++) {
-		if (Vplayer.at(i) == 0) {
-			Vplayer.at(i) = val;
-		return 0;
-		}
-	}
+	pscore = pscore + val;
+	Vplayer.push_back(val);
+	//for (int i = 0; i < (Vplayer.size()); i++) {
+	//	//if (Vplayer.at(i) == 0) {
+	//		Vplayer.at(i) = val;
+	//		return 0;
+	//	//}
+	//}
 	return 0;
 }
 
@@ -52,9 +55,6 @@ void printhand() {
 		if (Vplayer[i] != 0) {
 		std::cout << Vplayer[i] << ", ";
 		}
-	}
-	for (int i = 0; i < Vplayer.size(); i++) {
-		pscore = pscore + Vplayer.at(i);
 	}
 }
 
@@ -69,7 +69,7 @@ int playeraction() {
 		printhand();
 		std::cout << "Your total: " << pscore << std::endl;
 		std::cout << std::endl;
-		if (wincon() == false) {
+		if (pscorecheck() == false) {
 			return 0;
 		}
 		std::cout << "Wanna draw another card? (Y/N): ";
@@ -87,26 +87,28 @@ int playeraction() {
 }
 
 int gencard() {
-	int nrof10 = 0;
+	//int nrof10 = 0;
 	srand(time(NULL));
-	//std::srand(static_cast<unsigned int>(std::time(nullptr)));
-	for (int i = 0; i < (Vhcard.size()); i++) {
-		if (Vhcard.at(i) == 0) {
-			Vhcard.at(i) = rand() % 10 + 1;
-			if (Vhcard.at(i) == 10) {
-				nrof10++;
-			}
-			if (nrof10 >= 4) {
-				Vhcard.at(i) = rand() % 10 + 1;
-			}
-			std::cout << "The house draws: ";
-			std::cout << Vhcard.at(i) << std::endl;
-			return 0;
-		}
-	}
+	return rand() % 10 + 1;
+	////std::srand(static_cast<unsigned int>(std::time(nullptr)));
+	//Vhcard.push_back(0);
+	//for (int i = 0; i < (Vhcard.size()); i++) {
+	//	if (Vhcard.at(i) == 0) {
+	//		Vhcard.at(i) = rand() % 10 + 1;
+	//		//if (Vhcard.at(i) == 10) {
+	//		//	nrof10++;
+	//		//}
+	//		//if (nrof10 >= 4) {
+	//		//	Vhcard.at(i) = rand() % 10 + 1;
+	//		//}
+	//		std::cout << "The house draws: ";
+	//		std::cout << Vhcard.at(i) << std::endl;
+	//		return 0;
+	//	}
+	//}
 }
 
-bool wincon() {
+bool pscorecheck() {
 	if (pscore >= 21) {
 		return false;
 	}
@@ -118,25 +120,51 @@ bool wincon() {
 
 void house() {
 	bool con = true;
-	do {
-		gencard();
-		for (auto i : Vhcard) {
-			hscore += i;
+	while (con == true){
+		housedraw = gencard();
+		hscore = hscore + housedraw;
+		Vhcard.push_back(housedraw);
+		//for (int i = 0; i < Vhcard.size(); i++) {
+		//	Vhcard.at(i) = housedraw;
+		//}
+		
+		/*std::cout << "The house draws: " << housedraw << std::endl;*/
+		std::cout << "The house draws " << housedraw << " and now has the hand: ";
+		for (int i = 0; i < Vhcard.size(); i++) {
+			if (Vhcard[i] != 0) {
+				std::cout << Vhcard[i] << ", ";
+			}
 		}
-		std::cout << "House total: " << hscore;
-		std::cout << hscore << std::endl;
-		if (hscore > pscore) {
+		std::cout << std::endl;
+		std::cout << "House total: " << hscore << std::endl;
+		wincheck();
+		if (wincheck() == 1 || wincheck() == 2) {
 			con = false;
 		}
-		else if (hscore < pscore) {
-			gencard();
-		}
-		else if (hscore = pscore) {
-			match = true;
-			std::cout << "Match!";
-		}
-	} while (con == true);
-	
 
+		//if (wincheck() == 1) {
+		//	con = false;
+		//}
+		//else if (wincheck() == 2) {
+		//	//gencard();
+		//}
+		//else if (hscore = pscore) {
+		//	match = true;
+		//	std::cout << "Match!";
+		//}
+	};
+}
 
+int wincheck() {
+	if (hscore > pscore) {
+		return 1;
+		std::cout << "You lose!";
+	}
+	else if (hscore < pscore) {
+		return 0;
+	}
+	else if (hscore = pscore) {
+		return 2;
+		std::cout << "Match!";
+	}
 }
