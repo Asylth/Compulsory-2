@@ -93,7 +93,7 @@ int playeraction() {
 			return 0;
 		}
 		std::cout << "Wanna draw another card? (Y/N): ";
-		//std::cin.clear();
+		std::cin.clear();
 		std::cin >> yorn;
 		std::cout << std::endl;
 		switch (yorn) {
