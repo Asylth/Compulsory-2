@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <cstdlib>
 
 int drawcard(int); //places the player draw
 int gencard();
@@ -13,7 +14,6 @@ void house();
 int wincheck();
 
 bool run = true;
-int pchoice;
 std::vector <int> Vplayer;
 std::vector <int> Vhcard;
 
@@ -27,10 +27,13 @@ int housedraw = 0;
 bool match = false;
 bool pvic = false;
 bool hvic = false;
+int hmoney = 100;
+int pmoney = 100;
 
 
 int main()
 {
+	srand(time(nullptr));
 	do {
 		playeraction(); //player draw
 		house(); //house draws
@@ -38,15 +41,19 @@ int main()
 }
 
 int drawcard(int val) {
+	int ace;
+	if (val == 1) {
+		std::cout << "You drew an ace, you can pick it's value (1 or 11): ";
+		std::cin >> ace;
+		pscore = pscore + ace;
+		Vplayer.push_back(ace);
+		return ace;
+	}
+	else {
 	pscore = pscore + val;
 	Vplayer.push_back(val);
-	//for (int i = 0; i < (Vplayer.size()); i++) {
-	//	//if (Vplayer.at(i) == 0) {
-	//		Vplayer.at(i) = val;
-	//		return 0;
-	//	//}
-	//}
-	return 0;
+	return val;
+	}
 }
 
 void printhand() {
@@ -61,18 +68,32 @@ void printhand() {
 int playeraction() {
 	bool con = true;
 	char yorn;
+	int pchoice; //stores plater choice
+	int tempdraw; //holds the drawn card val
 
 	do{
-		std::cout << "Pick a card from 1-10: ";
+		std::cout << "Draw a card? (Y/N): ";
 		std::cin >> pchoice;
-		drawcard(pchoice);
-		printhand();
+		std::cout << std::endl;
+		switch (pchoice) {
+		case 'Y':case 'y':
+			tempdraw = gencard();
+			drawcard(tempdraw);
+			std::cout << "You drew a " << tempdraw << std::endl;
+			//std::cout << "You drew a " << drawcard(gencard())<< std::endl;
+			printhand();
+			break;
+		case 'N':case 'n':
+			printhand();
+			break;
+		}
 		std::cout << "Your total: " << pscore << std::endl;
 		std::cout << std::endl;
 		if (pscorecheck() == false) {
 			return 0;
 		}
 		std::cout << "Wanna draw another card? (Y/N): ";
+		//std::cin.clear();
 		std::cin >> yorn;
 		std::cout << std::endl;
 		switch (yorn) {
@@ -88,7 +109,6 @@ int playeraction() {
 
 int gencard() {
 	//int nrof10 = 0;
-	srand(time(NULL));
 	return rand() % 10 + 1;
 	////std::srand(static_cast<unsigned int>(std::time(nullptr)));
 	//Vhcard.push_back(0);
